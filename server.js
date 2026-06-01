@@ -7,12 +7,12 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 dotenv.config();
 
-if (!process.env.MONGO_URI || !process.env.JWT_SECRET) {
-  console.error("Missing required environment variables: MONGO_URI and JWT_SECRET");
+const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+if (!mongoUri || !process.env.JWT_SECRET) {
+  console.error("Missing required environment variables: MONGO_URI or MONGODB_URI and JWT_SECRET");
   process.exit(1);
 }
-
-connectDB();
 
 const app = express();
 
@@ -35,6 +35,13 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+startServer();
